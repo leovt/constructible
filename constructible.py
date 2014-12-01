@@ -1,4 +1,5 @@
 # coding:utf-8
+from __future__ import division
 
 '''
 Representing constructible numbers
@@ -67,8 +68,8 @@ class Constructible(object):
                 self.is_zero = a.is_zero
 
             else:
-                # used as a conversion from int or float
-                self.a = a
+                # used as a conversion from Fraction, int or float
+                self.a = Fraction(a)
                 self.b = 0
                 self.field = ()
                 self.is_zero = (a == 0)
@@ -79,25 +80,27 @@ class Constructible(object):
             self.b = b
             self.field = field
             self.is_zero = (a == b == 0)
-            assert a.field == b.field == self.base_field
+            assert not field or a.field == b.field == self.base_field
 
 
     @property
     def r(self):
-        return self.field[1]
+        return self.field[0]
 
 
     @property
     def base_field(self):
-        return self.field[0]
+        return self.field[1]
 
 
     def __repr__(self):
-        return '%s(%r, %r, %r, %r)' % (self.__class__.__name__, self.a, self.b, self.r, self.field[0])
+        return '%s(%r, %r, %r)' % (self.__class__.__name__, self.a, self.b, self.field)
 
 
     def __str__(self):
-        return '(%s + %s * sqrt(%s))' % (self.a, self.b, self.field[1])
+        if not self.b:
+            return str(self.a)
+        return '(%s + %s * sqrt(%s))' % (self.a, self.b, self.r)
 
 
     # Arithmetical Operator
@@ -129,9 +132,13 @@ class Constructible(object):
 
     # Multiplicative Group Operations * /
     def inverse(self):
-        # 1/(a+b√r) = (a-b√r)/((a+b√r)*(a-b√r)) = (a+b√r) / (a*a-b*b*r)
-        d = self.a * self.a - self.b * self.b * self.r
-        return Constructible(self.a / d, -self.b / d, self.field)
+        if self.field:
+            # 1/(a+b√r) = (a-b√r)/((a+b√r)*(a-b√r)) = (a+b√r) / (a*a-b*b*r)
+            d = self.a * self.a - self.b * self.b * self.r
+            return Constructible(self.a / d, -self.b / d, self.field)
+        else:
+            # self is a rational
+            return Constructible(1 / self.a)
 
     def __mul__(self, other):
         if not isinstance(other, Constructible):
@@ -141,12 +148,14 @@ class Constructible(object):
                 return NotImplemented
 
         if self.field == other.field:
+            if not self.field:
+                return Constructible(self.a * other.a)
             # (a+b√r)(c+d√r) = (ac+bdr) + (ad+bc)√r
             return Constructible(self.a * other.a + self.b * other.b * self.r,
                                  self.a * other.b + self.b * other.a,
                                  self.field)
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if not isinstance(other, Constructible):
             if isinstance(other, Rational):
                 return Constructible(self.a / other, self.b / other, self.field)
@@ -155,7 +164,9 @@ class Constructible(object):
 
         return self * other.inverse()
 
-    def __rdiv__(self, other):
+    __rmul__ = __mul__
+
+    def __rtruediv__(self, other):
         return self.inverse() * other
 
     # taking square roots
