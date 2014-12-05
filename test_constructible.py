@@ -124,6 +124,20 @@ class TestArithmeticOperators(TestCase):
                     self.assertFalse(result.b)
                     self.assertFalse(result.field)
 
+    def test_expressions_type(self):
+        from constructible import sqrt, Constructible
+        s = sqrt(2)
+        self.assertIsInstance(s, Constructible)
+        self.assertIsInstance(2 * s, Constructible)
+        self.assertIsInstance(2 - s, Constructible)
+        t = 3 - 2 * s
+        self.assertIsInstance(t, Constructible)
+        u = s - s
+        self.assertIsInstance(u, Constructible)
+        v = -t
+        self.assertIsInstance(v, Constructible)
+
+
 class TestStrRepr(TestCase):
     def test_repr(self):
         from constructible import Constructible
@@ -141,7 +155,65 @@ class TestStrRepr(TestCase):
         self.assertEqual(str(Constructible(Constructible(2), Constructible(3), (Constructible(5), ()))),
                          '(2 + 3 * sqrt(5))')
 
+class TestComparison(TestCase):
+    def test_rational_comparison(self):
+        ''' test comparison operators on constructible 
+        instances representing rationals '''
+        from constructible import Constructible
+        from fractions import Fraction as F
+        from operator import eq, ne, gt, lt, ge, le
 
+        for op in (eq, ne, gt, lt, ge, le):
+            with self.subTest(op=op):
+                for a in [0, 1, -1]:
+                    for b in [0, 1, -1]:
+                        result = op(Constructible(a), Constructible(b))
+                        self.assertEqual(result, op(a, b))
+                        self.assertIsInstance(result, bool)
+
+    def test_comparison_Qsqrt2(self):
+        ''' test comparison operators on instances of Q[sqrt(2)] '''
+        from constructible import sqrt
+        from fractions import Fraction as F
+        from operator import eq, ne, gt, lt, ge, le
+
+        s = sqrt(2)
+        t = 3 - 2 * s
+        u = s - s
+        v = -t
+
+        self.assertTrue(s.field == t.field == u.field == v.field, "Precondition")
+
+        # numbers is sorted ascending, so the comarison of numbers and therir indices must be same
+        numbers = [v, u, t, s]
+
+        self.assertTrue(s.field == t.field == u.field == v.field, "Precondition")
+
+        for op in (eq, ne, gt, lt, ge, le):
+            with self.subTest(op=op):
+                for i, a in enumerate(numbers):
+                    for j, b in enumerate(numbers):
+                        result = op(a, b)
+                        self.assertEqual(result, op(i, j))
+                        self.assertIsInstance(result, bool)
+
+
+class TestSqrt(TestCase):
+    def test_sqrt_2(self):
+        from constructible import sqrt
+        r = sqrt(2)
+        self.assertEqual(r.a, 0)
+        self.assertEqual(r.b, 1)
+        self.assertEqual(len(r.field), 2)
+        self.assertEqual(r.field[0], 2)
+        self.assertEqual(str(r), '(0 + 1 * sqrt(2))')
+        self.assertTrue(r > 0)
+
+    def test_double_sqrt(self):
+        from constructible import sqrt
+        r = sqrt(2)
+        s = sqrt(r)
+        self.assertEqual(str(s), '((0 + 0 * sqrt(2)) + (1 + 0 * sqrt(2)) * sqrt((0 + 1 * sqrt(2))))')
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

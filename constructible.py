@@ -45,7 +45,7 @@ def fsqrt(q):
     if q == 0:
         return q, 1
     if q < 0:
-        raise ValueError('math domain error')
+        raise ValueError('math domain error %s' % q)
 
     a, b = isqrt(q.numerator)
     c, d = isqrt(q.denominator)
@@ -56,6 +56,11 @@ def fsqrt(q):
 
 class Constructible(object):
     def __init__(self, a, b=None, field=()):
+        assert isinstance(field, tuple)
+        if field:
+            assert len(field) == 2
+            assert isinstance(field[0], Constructible)
+            assert isinstance(field[1], tuple)
         if b is None:
             if field:
                 raise ValueError('can not set field if b is not given')
@@ -80,7 +85,7 @@ class Constructible(object):
             self.b = b
             self.field = field
             self.is_zero = (a == b == 0)
-            assert not field or a.field == b.field == self.base_field
+            assert not field or a.field == b.field == self.base_field, '%r, %r, %r, %r' % (field, a.field, b.field, self.base_field)
 
 
     @property
@@ -120,7 +125,9 @@ class Constructible(object):
 
         if self.field == other.field:
             return Constructible(self.a + other.a, self.b + other.b, self.field)
-        # TODO: implement joining fields
+
+        a, b = self.join(other)
+        return a + b
 
     def __sub__(self, other):
         return self +(-other)
@@ -169,6 +176,124 @@ class Constructible(object):
     def __rtruediv__(self, other):
         return self.inverse() * other
 
+    # equality and ordering
+    def _sign(self):
+        if self.is_zero:
+            return 0
+        elif not self.field:
+            # representing a rational
+            if self.a > 0:
+                return 1
+            elif self.a < 0:
+                return -1
+            else:
+                return 0
+        else:
+            if self.a.is_zero:
+                return self.b._sign()
+            if self.b.is_zero:
+                return self.a._sign()
+            sa = self.a._sign()
+            sb = self.b._sign()
+            if sa == sb:
+                return sa
+            else:
+                return sa * (self.a * self.a - self.r * self.b * self.b)._sign()
+
+    def __eq__(self, other):
+        if other == 0:
+            return self.is_zero
+
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() == 0
+
+        return NotImplemented
+
+    def __ne__(self, other):
+        if other == 0:
+            return not self.is_zero
+
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() != 0
+
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() < 0
+
+    def __gt__(self, other):
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() > 0
+
+    def __le__(self, other):
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() <= 0
+
+    def __ge__(self, other):
+        if isinstance(other, Constructible) or isinstance(other, Rational):
+            return (self -other)._sign() >= 0
+
+    def join(self, other):
+        '''return a tuple (new_self, new_other) such that
+        new_self == self, new_other == other, and new_self.field == new_other.field '''
+        if self.field == other.field:
+            return self, other
+
+        field, f1, f2 = Constructible.join_fields(self.field, other.field)
+        return f1(self), f2(other)
+
+    @staticmethod
+    def join_fields(field1, field2):
+        Q = ()
+
+        if field1 == Q:
+            def f1(x):
+                assert x.field == field1
+                return Constructible.lift_rational_field(x.a, field2)
+            def f2(y):
+                assert y.field == field2
+                return y
+            return field2, f1, f2
+
+        if field2 == Q:
+            def f1(x):
+                assert x.field == field1
+                return x
+            def f2(y):
+                assert y.field == field2
+                return Constructible.lift_rational_field(y.a, field1)
+            return field1, f1, f2
+
+        r, base2 = field2
+        jbase, f1_base, f2_base = Constructible.join_fields(field1, base2)
+
+        s = f2_base(r)._try_sqrt()
+        if s is None:
+            field = (f2_base(r), jbase)
+            def f1(x):
+                assert x.field == field1
+                return Constructible(f1_base(x), Constructible.lift_rational_field(0, jbase), field)
+            def f2(y):
+                assert y.field == field2
+                return Constructible(f2_base(y.a), f2_base(y.b), field)
+            return field, f1, f2
+        else:
+            def f2(y):
+                assert y.field == field2
+                return f2_base(y.a) + f2_base(y.b) * s
+            return jbase, f1_base, f2
+
+    @staticmethod
+    def lift_rational_field(q, field):
+        if not field:
+            return Constructible(q)
+        else:
+            zero = Constructible.lift_rational_field(0, field[1])
+            lift = Constructible.lift_rational_field(q, field[1])
+            return Constructible(lift, zero, field)
+
+
     # taking square roots
     def _try_sqrt(self):
         ''' try to compute the square root in the field itself.
@@ -183,7 +308,14 @@ class Constructible(object):
             else:
                 return None
 
-        n = (self.a * self.a - self.b * self.b * self.r)._try_sqrt()
+        if self._sign() < 0:
+            raise ValueError('math domain error %s' % self)
+
+        nn = self.a * self.a - self.b * self.b * self.r
+        if nn._sign() < 0:
+            return None
+
+        n = nn._try_sqrt()
         if n is None:
             return None
 
@@ -199,5 +331,19 @@ class Constructible(object):
 
         return None
 
+def sqrt(n):
+    '''return the square root of n in an exact representation'''
+    if isinstance(n, Rational):
+        n = Constructible(n)
+    elif not isinstance(n, Constructible):
+        raise ValueError('the square root is not implemented for the type %s' % type(n))
 
+    r = n._try_sqrt()
+    if r is not None:
+        return r
+    return Constructible(Constructible.lift_rational_field(0, n.field),
+                         Constructible.lift_rational_field(1, n.field),
+                         (n, n.field))
 
+# a = sqrt(sqrt(sqrt(sqrt(3))))
+# print(a)
