@@ -55,6 +55,7 @@ def fsqrt(q):
 
 
 class Constructible(object):
+    # pylint: disable=protected-access
     def __init__(self, a, b=None, field=()):
         assert isinstance(field, tuple)
         if field:
@@ -178,6 +179,7 @@ class Constructible(object):
 
     # equality and ordering
     def _sign(self):
+        # pylint: disable=maybe-no-member
         if self.is_zero:
             return 0
         elif not self.field:
@@ -240,11 +242,12 @@ class Constructible(object):
         if self.field == other.field:
             return self, other
 
-        field, f1, f2 = Constructible.join_fields(self.field, other.field)
+        _, f1, f2 = Constructible.join_fields(self.field, other.field)
         return f1(self), f2(other)
 
     @staticmethod
     def join_fields(field1, field2):
+        # pylint: disable=function-redefined
         Q = ()
 
         if field1 == Q:
@@ -338,7 +341,7 @@ def sqrt(n):
     elif not isinstance(n, Constructible):
         raise ValueError('the square root is not implemented for the type %s' % type(n))
 
-    r = n._try_sqrt()
+    r = n._try_sqrt()  # pylint: disable=protected-access
     if r is not None:
         return r
     return Constructible(Constructible.lift_rational_field(0, n.field),

@@ -160,7 +160,6 @@ class TestComparison(TestCase):
         ''' test comparison operators on constructible 
         instances representing rationals '''
         from constructible import Constructible
-        from fractions import Fraction as F
         from operator import eq, ne, gt, lt, ge, le
 
         for op in (eq, ne, gt, lt, ge, le):
@@ -174,7 +173,6 @@ class TestComparison(TestCase):
     def test_comparison_Qsqrt2(self):
         ''' test comparison operators on instances of Q[sqrt(2)] '''
         from constructible import sqrt
-        from fractions import Fraction as F
         from operator import eq, ne, gt, lt, ge, le
 
         s = sqrt(2)
