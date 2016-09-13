@@ -213,6 +213,22 @@ class TestSqrt(TestCase):
         s = sqrt(r)
         self.assertEqual(str(s), '((0 + 0 * sqrt(2)) + (1 + 0 * sqrt(2)) * sqrt((0 + 1 * sqrt(2))))')
 
+    def test_sqrt23(self):
+        from constructible import sqrt
+        r = sqrt(2) + sqrt(3)
+        self.assertTrue(r > 0)
+        self.assertEqual(r*r*r*r - 10*r*r + 1, 0)
+
+    def test_sqrt235(self):
+        from constructible import sqrt
+        r = sqrt(2) + sqrt(3) + sqrt(5)
+        r2 = r*r
+        r4 = r2*r2
+        r6 = r2*r4
+        r8 = r2*r6
+        self.assertTrue(r > 0)
+        self.assertEqual(r8 - 40*r6 + 352*r4 - 960*r2 + 576, 0)
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
