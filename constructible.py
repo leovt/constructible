@@ -339,13 +339,15 @@ class Constructible(object):
 
         a = ((self.a + n) * Fraction(1, 2))._try_sqrt()
         if a is not None:
-            result = Constructible(a, self.b / a * Fraction(1, 2), self.r)
+            result = Constructible(a, self.b / a * Fraction(1, 2), self.field)
             assert result.field == self.field
+            return result
 
         b = ((self.a + n) / self.r * Fraction(1, 2))._try_sqrt()
         if b is not None:
-            result = Constructible(self.a / b * Fraction(1, 2), b, self.r)
+            result = Constructible(self.a / b * Fraction(1, 2), b, self.field)
             assert result.field == self.field
+            return result
 
         return None
 
@@ -363,5 +365,3 @@ def sqrt(n):
                          Constructible.lift_rational_field(1, n.field),
                          (n, n.field))
 
-# a = sqrt(sqrt(sqrt(sqrt(3))))
-# print(a)
