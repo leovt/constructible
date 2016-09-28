@@ -244,6 +244,12 @@ class TestSqrt(TestCase):
         self.assertTrue(r > 0)
         self.assertEqual(r8 - 40*r6 + 352*r4 - 960*r2 + 576, 0)
 
+    def test_sqrt_square(self):
+        from constructible import sqrt
+        r = sqrt(2) + sqrt(3) + sqrt(5)
+        self.assertEqual(sqrt(r*r), r)
+        
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
