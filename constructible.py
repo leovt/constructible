@@ -345,7 +345,7 @@ class Constructible(object):
 
         b = ((self.a + n) / self.r * Fraction(1, 2))._try_sqrt()
         if b is not None:
-            result = Constructible(self.a / b * Fraction(1, 2), b, self.field)
+            result = Constructible(self.b / b * Fraction(1, 2), b, self.field)
             assert result.field == self.field
             return result
 
