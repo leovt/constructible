@@ -31,6 +31,11 @@ class TestCase(unittest.TestCase):
             return subTest()
 
 
+    if not hasattr(unittest.TestCase, 'assertIsInstance'):
+        def assertIsInstance(self, obj, cls, msg=None):
+            self.assertTrue(isinstance(obj, cls), msg=msg)
+            
+
 class TestHelperFunctions(TestCase):
     def test_isqrt(self):
         ''' test the isqrt function '''
