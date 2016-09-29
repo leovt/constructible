@@ -250,6 +250,15 @@ class TestSqrt(TestCase):
         self.assertEqual(sqrt(r*r), r)
         
 
+class TestTrySqrt(TestCase):
+    def test_sqrt2(self):
+        from constructible import sqrt
+        r = sqrt(2)
+        two = r*r
+        self.assertEqual(two, 2)
+        s = two._try_sqrt()
+        self.assertEqual(r, s)
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
