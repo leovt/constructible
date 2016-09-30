@@ -178,6 +178,9 @@ class Constructible(object):
                                  self.a * other.b + self.b * other.a,
                                  self.field)
 
+        a, b = self.join(other)
+        return a * b
+
     def __truediv__(self, other):
         if not isinstance(other, Constructible):
             if isinstance(other, Rational):
@@ -239,17 +242,25 @@ class Constructible(object):
         if isinstance(other, Constructible) or isinstance(other, Rational):
             return (self -other)._sign() < 0
 
+        return NotImplemented
+
     def __gt__(self, other):
         if isinstance(other, Constructible) or isinstance(other, Rational):
             return (self -other)._sign() > 0
+
+        return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, Constructible) or isinstance(other, Rational):
             return (self -other)._sign() <= 0
 
+        return NotImplemented
+
     def __ge__(self, other):
         if isinstance(other, Constructible) or isinstance(other, Rational):
             return (self -other)._sign() >= 0
+
+        return NotImplemented
 
     def join(self, other):
         '''return a tuple (new_self, new_other) such that
