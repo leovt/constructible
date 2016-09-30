@@ -44,9 +44,18 @@ There are some tests using `untittest`. Thanks to [Travis-CI](https://travis-ci.
 Realeasing on PYPI
 ------------------
 The following steps are needed:
-...
+
+* Update the version in setup.py
+* Tag the version in git
+* Test release with 
+    `python setup.py register -r pypitest`
+    `python setup.py sdist upload -r pypitest`
+* Productive release with
+    `python setup.py register -r pypi`
+    `python setup.py sdist upload -r pypi`
 
 Changelog
 ---------
 
 * 2016-05-23 V0.1 Initial Release
+* 2016-09-30 V0.2 Fixing Issue 1 and added Tests
