@@ -61,3 +61,12 @@ Changelog
 
 * 2016-05-23 V0.1 Initial Release
 * 2016-09-30 V0.2 Fixing Issue 1 and added Tests
+
+Aknowledgements
+---------------
+
+Thanks to [Anders Kaesorg](https://github.com/andersk) whose 
+[implementation of constructible numbers in Haskell](https://github.com/andersk/haskell-constructible)
+provided inspiration and in particular the 
+[algorithm for taking square roots](https://github.com/leovt/constructible/wiki/Taking-Square-Roots-in-quadratic-extension-Fields)
+in quadratic extension fields.
