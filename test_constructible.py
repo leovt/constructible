@@ -239,6 +239,12 @@ class TestSqrt(TestCase):
         self.assertTrue(r > 0)
         self.assertEqual(r*r*r*r - 10*r*r + 1, 0)
 
+    def test_sqrt236(self):
+        from constructible import sqrt
+        r = sqrt(2) * sqrt(3)
+        self.assertTrue(r > 0)
+        self.assertEqual(r, sqrt(6))
+
     def test_sqrt235(self):
         from constructible import sqrt
         r = sqrt(2) + sqrt(3) + sqrt(5)
