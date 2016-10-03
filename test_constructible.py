@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #    
+from _stat import S_IEXEC
 '''
 Unit tests for constructible
 '''
@@ -275,6 +276,29 @@ class TestTrySqrt(TestCase):
         self.assertEqual(two, 2)
         s = two._try_sqrt()
         self.assertEqual(r, s)
+        
+class TestHeptadekagon(TestCase):
+    def test_roots(self):
+        from constructible import sqrt
+        r = sqrt(17)
+        u = sqrt(2 * (17 - r))
+        v = sqrt(2 * (17 + r))
+        cos = (-1 + r + u + 2*sqrt(17 + 3*r - u - 2*v)) / 16
+        sin = sqrt(1 - cos*cos)
+        
+        s_i = 0
+        c_i = 1
+        
+        for i in range(17):
+            s = sin * c_i + cos * s_i
+            c = cos * c_i - sin * s_i
+            self.assertEqual(s*s + c*c, 1, "radius not equal to 1 at i=%d" % i)
+            s_i = s
+            c_i = c
+        
+        self.assertEqual(s_i, 0)
+        self.assertEqual(c_i, 1)
+        
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
