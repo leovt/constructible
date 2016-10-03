@@ -13,7 +13,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #    
-from _stat import S_IEXEC
+from __future__ import division
+
 '''
 Unit tests for constructible
 '''
