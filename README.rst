@@ -15,9 +15,7 @@ the lengths which can be constructed from the unit length using only a compass a
 Usage
 -----
 
-Usually the ``sqrt`` function is enough to work with constructible numbers:
-
-::
+Usually the ``sqrt`` function is enough to work with constructible numbers::
 
     >>> from constructible import sqrt
     >>> x = sqrt(2) + sqrt(3)
@@ -34,9 +32,7 @@ Usually the ``sqrt`` function is enough to work with constructible numbers:
 Installation
 ------------
 
-To install from PYPI just type
-
-::
+To install from PYPI just type ::
 
     pip install constructible
 
@@ -45,7 +41,7 @@ The library is a single pure python file, so it is also easy to install by hand.
 Testing
 -------
 
-There are some tests using ``untittest``. Thanks to `Travis-CI`_ each push to github triggers a test:
+There are some tests using ``unittest``. Thanks to `Travis-CI`_ each push to github triggers a test:
 |Build Status|
 
 Realeasing on PYPI
@@ -54,15 +50,20 @@ Realeasing on PYPI
 The following steps are needed:
 
 -  Update the version in setup.py
--  Tag the version in git
-   ``git tag 0.1 -m "Adds a tag so that we can put this on PyPI."``
-   ``git push --tags origin``
--  Test release with
-   ``python setup.py register -r pypitest``
-   ``python setup.py sdist upload -r pypitest``
--  Productive release with
-   ``python setup.py register -r pypi``
-   ``python setup.py sdist upload -r pypi``
+-  Tag the version in git::
+
+       git tag 0.1 -m "Adds a tag so that we can put this on PyPI."
+       git push --tags origin
+       
+-  Test release with::
+
+       python setup.py register -r pypitest
+       python setup.py sdist upload -r pypitest
+
+-  Productive release with::
+
+     python setup.py register -r pypi
+     python setup.py sdist upload -r pypi
 
 Changelog
 ---------
