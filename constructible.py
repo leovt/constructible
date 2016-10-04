@@ -139,6 +139,11 @@ class Constructible(object):
             else:
                 return NotImplemented
 
+        if self.is_zero:
+            return other
+        if other.is_zero:
+            return self
+
         if self.field == other.field:
             return Constructible(self.a + other.a, self.b + other.b, self.field)
 
@@ -169,6 +174,11 @@ class Constructible(object):
                 return Constructible(self.a * other, self.b * other, self.field)
             else:
                 return NotImplemented
+
+        if self.is_zero:
+            return self
+        if other.is_zero:
+            return other
 
         if self.field == other.field:
             if not self.field:
