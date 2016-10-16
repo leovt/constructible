@@ -226,14 +226,14 @@ class TestSqrt(TestCase):
         self.assertEqual(r.b, 1)
         self.assertEqual(len(r.field), 2)
         self.assertEqual(r.field[0], 2)
-        self.assertEqual(str(r), '(0 + 1 * sqrt(2))')
+        self.assertEqual(str(r), 'sqrt(2)')
         self.assertTrue(r > 0)
 
     def test_double_sqrt(self):
         from constructible import sqrt
         r = sqrt(2)
         s = sqrt(r)
-        self.assertEqual(str(s), '((0 + 0 * sqrt(2)) + (1 + 0 * sqrt(2)) * sqrt((0 + 1 * sqrt(2))))')
+        self.assertEqual(str(s), 'sqrt(sqrt(2))')
 
     def test_sqrt23(self):
         from constructible import sqrt

@@ -121,7 +121,22 @@ class Constructible(object):
     def __str__(self):
         if not self.b:
             return str(self.a)
-        return '(%s + %s * sqrt(%s))' % (self.a, self.b, self.r)
+        elif self.b==1:
+            if not self.a:
+                return 'sqrt(%s)' % (self.r)
+            else:
+                return '(%s + sqrt(%s))' % (self.a, self.r)
+        else:
+            if not self.a:
+                return '(%s * sqrt(%s))' % (self.b, self.r)
+            str_b = str(self.b)
+            if str_b == '-1':
+                str_b = ' - '
+            elif str_b.startswith('-'):
+                str_b = '- ' + str_b[1:] + ' *'
+            else:
+                str_b = '+ ' + str_b + ' *'
+            return '(%s %s sqrt(%s))' % (self.a, str_b, self.r)
 
 
     # Arithmetical Operator
@@ -229,6 +244,11 @@ class Constructible(object):
                 return sa
             else:
                 return sa * (self.a * self.a - self.r * self.b * self.b)._sign()
+
+    def __bool__(self):
+        return self != 0
+    
+    __nonzero__ = __bool__
 
     def __eq__(self, other):
         if other == 0:
