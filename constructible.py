@@ -100,7 +100,10 @@ class Constructible(object):
             self.a = a
             self.b = b
             self.field = field
-            self.is_zero = (a == b == 0)
+            if field:
+                self.is_zero = a.is_zero and b.is_zero
+            else:
+                self.is_zero = (a == b == 0)
             assert not field or a.field == b.field == self.base_field, '%r, %r, %r, %r' % (field, a.field, b.field, self.base_field)
 
 
