@@ -301,6 +301,40 @@ class TestHeptadekagon(TestCase):
         self.assertEqual(c_i, 1)
         
 
+class TestHash(TestCase):
+    '''
+    Main requirement of the hash is that objects comparing equal 
+    must have the same hash. 
+    '''
+    def test_rational(self):
+        '''
+        hash of rationals represented as Constructible must be equal to the
+        hash of the original value.
+        '''
+        from constructible import Constructible
+        from fractions import Fraction as F
+        
+        for x in [0,1,-1,0.25,3.14,0.1,F(0,1),F(1,2),F(-1,1)]:
+            with self.subTest(x=x):
+                y = Constructible(x)
+                self.assertEqual(x,y, 'precondition for this test')
+                self.assertEqual(hash(x), hash(y), 'hash(%s)' % (x,))
+            
+    def test_equal(self):
+        '''
+        hash of multiple representations of the same value must be equal
+        '''
+        from constructible import sqrt
+        from fractions import Fraction as F
+        
+        for a,b in [(sqrt(2), 2/sqrt(2)),
+                    (sqrt(2), 1/sqrt(F(1,2))),
+                    (sqrt(2) + sqrt(3), sqrt(3) + sqrt(2))]:
+            with self.subTest(a=a, b=b):
+                self.assertEqual(a,b, 'precondition for this test')
+                self.assertEqual(hash(a), hash(b), '%s == %s, but hash is different' % (a,b))
+        
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
