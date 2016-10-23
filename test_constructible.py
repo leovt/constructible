@@ -314,7 +314,7 @@ class TestHash(TestCase):
         from constructible import Constructible
         from fractions import Fraction as F
         
-        for x in [0,1,-1,0.25,3.14,0.1,F(0,1),F(1,2),F(-1,1)]:
+        for x in [0,1,-1,F(0.25),F(3.14),F(0.1),F(0,1),F(1,2),F(-1,1)]:
             with self.subTest(x=x):
                 y = Constructible(x)
                 self.assertEqual(x,y, 'precondition for this test')
