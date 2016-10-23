@@ -15,6 +15,8 @@
 #    limitations under the License.
 #    
 from __future__ import division
+import math
+
 
 '''
 Representing constructible numbers
@@ -294,6 +296,27 @@ class Constructible(object):
             return (self -other)._sign() >= 0
 
         return NotImplemented
+    
+    def __hash__(self):
+        # rational numbers compare equal to self.a and also need to have the same hash.
+        if not self.field:
+            return hash(self.a)
+        # otherwise we need a hash that is independent of the representation of
+        # the constructible number. 
+        # float rounded to 8 significant figures should be ok as long as 
+        # the intermediate result of float are all representable as float and
+        # not too much precision is lost.
+        # a mathematically cleaner way would be to use the unique minimal polynomial 
+        # of the number
+        return hash('%.8g' % float(self))
+    
+    def __float__(self):
+        if self.is_zero:
+            return 0.0
+        elif self.field:
+            return float(self.a) + float(self.b) * math.sqrt(float(self.r))
+        else:
+            return float(self.a)
 
     def join(self, other):
         '''return a tuple (new_self, new_other) such that
