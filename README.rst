@@ -44,7 +44,7 @@ Testing
 There are some tests using ``unittest``. Thanks to `Travis-CI`_ each push to github triggers a test:
 |Build Status|
 
-Realeasing on PYPI
+Releasing on PYPI
 ------------------
 
 The following steps are needed:
@@ -70,6 +70,8 @@ Changelog
 
 -  2016-05-23 V0.1 Initial Release
 -  2016-09-30 V0.2 Fixing Issue 1 and added Tests
+-  2016-10-03 V0.3 Fixing Issue 2
+-  2016-10-23 V0.4 Added __hash__ and __float__, speed optimizations
 
 Aknowledgements
 ---------------
