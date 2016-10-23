@@ -317,7 +317,7 @@ class TestHash(TestCase):
         for x in [0,1,-1,F(0,1),F(1,2),F(-1,1)]:
             with self.subTest(x=x):
                 y = Constructible(x)
-                self.assertEqual(x,y, 'precondition for this test')
+                self.assertEqual(x,y, 'precondition for this test: %s==%s' % (x,y))
                 self.assertEqual(hash(x), hash(y), 'hash(%s)' % (x,))
             
     def test_equal(self):
