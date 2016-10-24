@@ -318,6 +318,30 @@ class Constructible(object):
         else:
             return float(self.a)
 
+    def coefficients(self):
+        '''
+        a sequence of all rational coefficients
+        '''
+        if not self.field:
+            return (self.a,)
+        else:
+            return self.a.coefficients() + self.b.coefficients()
+        
+    def minpoly(self):
+        power = (self+1-self)
+        assert power.field is self.field
+        n = len(power.coefficients())
+        matrix = [power.coefficients()]
+        for _ in range(n):
+            power *= self
+            matrix.append(list(power.coefficients()))
+        assert len(matrix) == n+1
+        
+        print('\n'.join('  '.join(map(str, row)) for row in matrix))
+        
+        
+        
+
     def join(self, other):
         '''return a tuple (new_self, new_other) such that
         new_self == self, new_other == other, and new_self.field == new_other.field '''
@@ -432,3 +456,43 @@ def sqrt(n):
                          Constructible.lift_rational_field(1, n.field),
                          (n, n.field))
 
+def row_reduce(rows):
+    n = len(rows)
+    m = len(rows[0])
+
+    def swap(i, j):
+        rows[i], rows[j] = rows[j], rows[i]
+
+    def mul(i, a):
+        for k in range(m):
+            rows[i][k] *= a
+
+    def add_mul(i, j, a):
+        for k in range(m):
+            rows[i][k] += a * rows[j][k]
+    
+    for i in range(n):
+        # make sure we have a nonzero pivot at position i
+        for p in range(i,n):
+            if rows[i][p]:
+                break
+        else:
+            raise ValueError
+       
+        if p!=i:
+            swap(i, p)
+
+        assert rows[i][i]
+
+        mul(i, Fraction(1, rows[i][i]))
+
+        for j in range(i+1, n):
+            if rows[j][i]:
+                add_mul(j, i, -rows[j][i])
+
+    for i in range(n-1,-1,-1):
+        for j in range(i-1, -1,-1):
+            if rows[j][i]:
+                add_mul(j, i, -rows[j][i])
+
+    return rows
