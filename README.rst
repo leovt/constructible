@@ -72,6 +72,7 @@ Changelog
 -  2016-09-30 V0.2 Fixing Issue 1 and added Tests
 -  2016-10-03 V0.3 Fixing Issue 2
 -  2016-10-23 V0.4 Added __hash__ and __float__, speed optimizations
+-  Added minpoly 
 
 Aknowledgements
 ---------------
