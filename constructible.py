@@ -328,12 +328,15 @@ class Constructible(object):
             return self.a.coefficients() + self.b.coefficients()
         
     def minpoly(self):
+        if self.is_zero:
+            return (0,1)
         power = (self+1-self)
-        assert power.field is self.field
+        assert power.field == self.field, '%r == %r' % (power.field, self.field)
         n = len(power.coefficients())
         matrix = [power.coefficients()]
         for _ in range(n):
             power *= self
+            assert power.field == self.field
             matrix.append(power.coefficients())
         assert len(matrix) == n+1
         
