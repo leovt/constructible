@@ -334,12 +334,18 @@ class Constructible(object):
         matrix = [power.coefficients()]
         for _ in range(n):
             power *= self
-            matrix.append(list(power.coefficients()))
+            matrix.append(power.coefficients())
         assert len(matrix) == n+1
         
-        print('\n'.join('  '.join(map(str, row)) for row in matrix))
-        
-        
+        matrix = list(map(list, zip(*matrix)))
+        matrix = row_reduce(matrix)
+
+        for i in range(n):
+            if not any(matrix[i]):
+                n = i
+                break
+            
+        return tuple(-matrix[i][n] for i in range(n)) + (1,)
         
 
     def join(self, other):
@@ -474,17 +480,17 @@ def row_reduce(rows):
     for i in range(n):
         # make sure we have a nonzero pivot at position i
         for p in range(i,n):
-            if rows[i][p]:
+            if rows[p][i]:
                 break
         else:
-            raise ValueError
+            continue
        
         if p!=i:
             swap(i, p)
 
         assert rows[i][i]
 
-        mul(i, Fraction(1, rows[i][i]))
+        mul(i, 1 / Fraction(rows[i][i]))
 
         for j in range(i+1, n):
             if rows[j][i]:

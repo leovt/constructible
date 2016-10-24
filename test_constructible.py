@@ -1,3 +1,4 @@
+# coding:utf-8
 # 
 #    Copyright 2016 Leonhard Vogt
 # 
@@ -334,7 +335,22 @@ class TestHash(TestCase):
             with self.subTest(a=a, b=b):
                 self.assertEqual(a,b, 'precondition for this test')
                 self.assertEqual(hash(a), hash(b), '%s == %s, but hash is different' % (a,b))
-        
+    
+class TestMinpoly(TestCase):
+    def test_sqrt23(self):
+        from constructible import sqrt
+        x = sqrt(2) + sqrt(3)
+        # the minimum polynomial of sqrt(2) + sqrt(3)
+        # is 1 - 10x² + x⁴
+        self.assertEqual(x.minpoly(), (1,0,-10,0,1))        
+
+    def test_sqrt232(self):
+        from constructible import sqrt
+        x = sqrt(2) + sqrt(3) - sqrt(2)
+        self.assertEqual(x, sqrt(3))
+        # the minimum polynomial of sqrt(2) + sqrt(3)
+        # is -3 + x²
+        self.assertEqual(x.minpoly(), (-3,0,1))        
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
