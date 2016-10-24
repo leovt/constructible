@@ -303,12 +303,7 @@ class Constructible(object):
             return hash(self.a)
         # otherwise we need a hash that is independent of the representation of
         # the constructible number. 
-        # float rounded to 8 significant figures should be ok as long as 
-        # the intermediate result of float are all representable as float and
-        # not too much precision is lost.
-        # a mathematically cleaner way would be to use the unique minimal polynomial 
-        # of the number
-        return hash('%.8g' % float(self))
+        return hash(self.minpoly())
     
     def __float__(self):
         if self.is_zero:
