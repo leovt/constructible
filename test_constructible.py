@@ -301,6 +301,16 @@ class TestHeptadekagon(TestCase):
         self.assertEqual(s_i, 0)
         self.assertEqual(c_i, 1)
         
+    def test_minpoly(self):
+        from constructible import sqrt
+        from fractions import Fraction as F 
+        r = sqrt(17)
+        u = sqrt(2 * (17 - r))
+        v = sqrt(2 * (17 + r))
+        cos = (-1 + r + u + 2*sqrt(17 + 3*r - u - 2*v)) / 16
+        self.assertEqual(cos.minpoly(), (
+            F(1,256), F(-8,256), F(-40,256), F(80,256), F(240,256), 
+            F(-192,256), F(-448,256), F(128,256), F(256,256)))
 
 class TestHash(TestCase):
     '''
@@ -351,6 +361,25 @@ class TestMinpoly(TestCase):
         # the minimum polynomial of sqrt(2) + sqrt(3)
         # is -3 + x²
         self.assertEqual(x.minpoly(), (-3,0,1))        
+
+    def test_sqrt236(self):
+        from constructible import sqrt
+        x = sqrt(5 + 2 * sqrt(6))
+        self.assertEqual(x, sqrt(2) + sqrt(3))
+        self.assertEqual(x.minpoly(), (1,0,-10,0,1))        
+        
+    def test_sqrt2362(self):
+        from constructible import sqrt
+        x = sqrt(5 + 2 * sqrt(6)) - sqrt(3)
+        self.assertEqual(x, sqrt(2))
+        self.assertEqual(x.minpoly(), (-2,0,1))        
+        
+    def test_zero(self):
+        from constructible import sqrt
+        x = sqrt(5 + 2 * sqrt(6)) - sqrt(3) - sqrt(2)
+        self.assertEqual(x, 0)
+        self.assertEqual(x.minpoly(), (0,1))        
+        
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
