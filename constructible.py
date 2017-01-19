@@ -1,19 +1,19 @@
 # coding:utf-8
-# 
+#
 #    Copyright 2016 Leonhard Vogt
-# 
+#
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
-# 
+#
 #        http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-#    
+#
 from __future__ import division
 import math
 
@@ -28,9 +28,9 @@ from fractions import Fraction
 from numbers import Rational
 
 def isqrt(n):
-    ''' given a non-negative integer n, return a pair (a,b) such that n = a * a * b 
+    ''' given a non-negative integer n, return a pair (a,b) such that n = a * a * b
         where b is a square-free integer.
-        
+
         If n is a perfect square, then a is its square root and b is one.
     '''
     # TODO: replace with a more efficient implementation
@@ -40,20 +40,34 @@ def isqrt(n):
     if n < 0:
         raise ValueError('math domain error')
 
-    a, b = 1, n
-    k = 2
-    while k * k <= b:
+    a, b, c = 1, n, 1
+
+    def divisors():
+        yield 2
+        yield 3
+        k = 5
+        while k * k <= b:
+            yield k
+            k += 2
+            yield k
+            k += 4
+            
+    for k in divisors():
         d, m = divmod(b, k * k)
         while m == 0:
             a *= k
             b = d
             d, m = divmod(b, k * k)
+        if b % k == 0:
+            b //= k
+            c *= k
+
         k += 1
-    return a, b
+    return a, b*c
 
 
 def fsqrt(q):
-    ''' given a non-negative fraction q, return a pair (a,b) such that q = a * a * b 
+    ''' given a non-negative fraction q, return a pair (a,b) such that q = a * a * b
         where b is a square-free integer.
 
         if q is a perfect square, a is its square root and b is one.
@@ -252,7 +266,7 @@ class Constructible(object):
 
     def __bool__(self):
         return self != 0
-    
+
     __nonzero__ = __bool__
 
     def __eq__(self, other):
@@ -296,20 +310,20 @@ class Constructible(object):
             return (self -other)._sign() >= 0
 
         return NotImplemented
-    
+
     def __hash__(self):
         # rational numbers compare equal to self.a and also need to have the same hash.
         if not self.field:
             return hash(self.a)
         # otherwise we need a hash that is independent of the representation of
-        # the constructible number. 
-        # float rounded to 8 significant figures should be ok as long as 
+        # the constructible number.
+        # float rounded to 8 significant figures should be ok as long as
         # the intermediate result of float are all representable as float and
         # not too much precision is lost.
-        # a mathematically cleaner way would be to use the unique minimal polynomial 
+        # a mathematically cleaner way would be to use the unique minimal polynomial
         # of the number
         return hash('%.8g' % float(self))
-    
+
     def __float__(self):
         if self.is_zero:
             return 0.0
@@ -382,7 +396,7 @@ class Constructible(object):
     # taking square roots
     def _try_sqrt(self):
         ''' try to compute the square root in the field itself.
-        
+
         if there is no square root in the field return None.
         '''
         if not self.field:
@@ -431,4 +445,3 @@ def sqrt(n):
     return Constructible(Constructible.lift_rational_field(0, n.field),
                          Constructible.lift_rational_field(1, n.field),
                          (n, n.field))
-
