@@ -311,18 +311,57 @@ class Constructible(object):
 
         return NotImplemented
 
+    # conjugation in the `self.field`
+    def _conjugate(self):
+        assert self.field, 'should not be called on rationals'
+        return Constructible(self.a, -self.b, self.field)
+
+    # minimal polynomial
+    # (a0, a1, ...) represents a0 * x**0 + a1 * x**1 + ...
+    def minpoly(self):
+        field = self.field
+        one = Constructible.lift_rational_field(1, field)
+        poly = (-self, one)
+
+        while field:
+            field = field[1]
+            if all(c.b == 0 for c in poly):
+                # `poly` is its own conjugate, so just unlift it
+                poly = tuple(c.a for c in poly)
+                continue
+
+            # calculate unlifted `poly * conj(poly)`
+            conj_poly = tuple(c._conjugate() for c in poly)
+            new_poly = []
+            deg = len(poly) - 1
+            zero = Constructible.lift_rational_field(0, field)
+
+            for m in range(deg * 2 + 1):
+                if m % 2 == 0:
+                    x = poly[m // 2] * conj_poly[m // 2]
+                    assert x.b == 0
+                    coef = x.a
+                else:
+                    coef = zero
+
+                # iterating i such that 0 <= i < m - i <= deg:
+                for i in range(max(0, m - deg), (m + 1) // 2):
+                    x = poly[i] * conj_poly[m - i]
+                    coef += x.a * 2
+
+                new_poly.append(coef)
+
+            poly = new_poly
+
+        return tuple(c.a for c in poly) # a tuple of `Rational`s
+
     def __hash__(self):
         # rational numbers compare equal to self.a and also need to have the same hash.
         if not self.field:
             return hash(self.a)
         # otherwise we need a hash that is independent of the representation of
         # the constructible number.
-        # float rounded to 8 significant figures should be ok as long as
-        # the intermediate result of float are all representable as float and
-        # not too much precision is lost.
-        # a mathematically cleaner way would be to use the unique minimal polynomial
-        # of the number
-        return hash('%.8g' % float(self))
+        return hash(self.minpoly())
 
     def __float__(self):
         if self.is_zero:

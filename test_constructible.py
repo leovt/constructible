@@ -334,7 +334,50 @@ class TestHash(TestCase):
             with self.subTest(a=a, b=b):
                 self.assertEqual(a,b, 'precondition for this test')
                 self.assertEqual(hash(a), hash(b), '%s == %s, but hash is different' % (a,b))
-        
+
+
+class TestMinPoly(TestCase):
+    def test_substitution(self):
+        ''' test that `a` substituted to `a.minpoly()` gives 0 '''
+        from constructible import sqrt
+        from fractions import Fraction as F
+
+        def eval(poly, arg):
+            value = 0
+            for coef in reversed(poly):
+                value = coef + value * arg
+            return value
+
+        for a in [sqrt(2),
+                  2/sqrt(5),
+                  1/sqrt(F(1,2)),
+                  sqrt(2) + sqrt(3),
+                  sqrt(3) + sqrt(2)]:
+            with self.subTest(a=a):
+                self.assertEqual(eval(a.minpoly(), a), 0, '%s is not a root of its minpoly' % (a,))
+
+    def test_degree(self):
+        ''' test that `a.minpoly()` has a certain degree '''
+        from constructible import sqrt, Constructible
+        from fractions import Fraction as F
+
+        def deg(num):
+            assert isinstance(num, Constructible)
+            value = 0
+            while num.field:
+                if num.b != 0:
+                    value += 1
+                num = num.a
+            return 2 ** value
+
+        for a in [sqrt(2),
+                  2/sqrt(5),
+                  1/sqrt(F(1,2)),
+                  sqrt(2) + sqrt(3),
+                  (sqrt(3) + sqrt(2)) - sqrt(3)]:
+            with self.subTest(a=a):
+                self.assertEqual(len(a.minpoly()) - 1, deg(a), 'minpoly of %s has the wrong degree' % (a,))
+
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
