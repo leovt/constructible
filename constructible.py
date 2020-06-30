@@ -27,6 +27,21 @@ Author: Leonhard Vogt
 from fractions import Fraction
 from numbers import Rational
 
+# increments of prime divisor candidates after 7, giving 73% skip
+_divisor_incs = (4,  2,  4,  2,  4,  6,  2,  6)
+#               11, 13, 17, 19, 23, 29, 31, 37 (mod 30)
+# here to avoid reevaluation each time `isqrt` is called
+
+def _divisors():
+    yield 2
+    yield 3
+    yield 5
+    k = 7
+    while True:
+        for k_inc in _divisor_incs:
+            yield k
+            k += k_inc
+
 def isqrt(n):
     ''' given a non-negative integer n, return a pair (a,b) such that n = a * a * b
         where b is a square-free integer.
@@ -40,31 +55,38 @@ def isqrt(n):
     if n < 0:
         raise ValueError('math domain error')
 
+    precomp = _isqrt_precomputed.get(n)
+    if precomp:
+        return precomp
+
     a, b, c = 1, n, 1
 
-    def divisors():
-        yield 2
-        yield 3
-        k = 5
-        while k * k <= b:
-            yield k
-            k += 2
-            yield k
-            k += 4
-            
-    for k in divisors():
-        d, m = divmod(b, k * k)
-        while m == 0:
+    for k in _divisors():
+        k_sqr = k * k
+        if k_sqr > b:
+            break
+
+        while True:
+            d, m = divmod(b, k_sqr)
+            if m != 0:
+                break
             a *= k
             b = d
-            d, m = divmod(b, k * k)
-        if b % k == 0:
-            b //= k
+
+        d, m = divmod(b, k)
+        if m == 0:
+            b = d
             c *= k
 
-        k += 1
-    return a, b*c
+        precomp = _isqrt_precomputed.get(b)
+        if precomp:
+            a_, b_ = precomp
+            return a * a_, c * b_
 
+    return a, b * c
+
+_isqrt_precomputed = dict() # should be defined before calling `isqrt`
+_isqrt_precomputed = {n: isqrt(n) for n in range(1, 1 + 100)}
 
 def fsqrt(q):
     ''' given a non-negative fraction q, return a pair (a,b) such that q = a * a * b
