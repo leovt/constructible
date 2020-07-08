@@ -378,6 +378,14 @@ class Constructible(object):
     # minimal polynomial
     # (a0, a1, ...) represents a0 * x**0 + a1 * x**1 + ...
     def minpoly(self):
+        """return a minimal polynomial for self.
+
+        The polynomial p is represented as a tuple a of rationals such that
+            p(x) := a[0] + a[1] * x + a[2] * x**2 + ... + a[n] * x**n
+        and satisfies
+            p(self) == 0
+        """
+
         field = self.field
         one = Constructible.lift_rational_field(1, field)
         poly = (-self, one)
