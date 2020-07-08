@@ -49,21 +49,36 @@ Releasing on PYPI
 
 The following steps are needed:
 
+-  make sure .pypirc is up to date::
+
+       [distutils]
+       index-servers =
+         pypinew
+         pypitest
+
+       [pypinew]
+       repository = https://upload.pypi.org/legacy/
+       username=xxx
+       password=xxx
+
+       [pypitest]
+       repository=https://test.pypi.org/legacy/
+       username=xxx
+       password=xxx
+
 -  Update the version in setup.py
 -  Tag the version in git::
 
        git tag 0.1 -m "Adds a tag so that we can put this on PyPI."
        git push --tags origin
-       
+
 -  Test release with::
 
-       python setup.py register -r pypitest
        python setup.py sdist upload -r pypitest
 
 -  Productive release with::
 
-     python setup.py register -r pypi
-     python setup.py sdist upload -r pypi
+     python setup.py sdist upload -r pypinew
 
 Changelog
 ---------
