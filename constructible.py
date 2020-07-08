@@ -108,8 +108,25 @@ def fsqrt(q):
 
 
 class Constructible(object):
+    """This class implements constructible numbers.
+    
+    It is usually not necessary to construct Constructible numbers explicitly,
+    use mathematical expressions with Constructible and Rational numbers or
+    use constructible.sqrt .
+    """
     # pylint: disable=protected-access
     def __init__(self, a, b=None, field=()):
+        """constructs a Constructible instance.
+        
+        The one-argument form wraps a Rational instance (e.g. an int or a Fraction)
+        in a Constructible instance.
+        
+        The default arguments are for internal use:
+        
+        If a and b are given they must be Constructible instances in the
+        same rational extension K. field must be a tuple (r, K) with 
+        r in K. The resulting Constructible represents a + b * sqrt(r) in K[sqrt(r)]
+        """
         assert isinstance(field, tuple)
         if field:
             assert len(field) == 2
@@ -147,19 +164,31 @@ class Constructible(object):
 
     @property
     def r(self):
+        """The square of the extension radix.
+        
+        The instance ist contained in the quardratic extension field
+        base_field[sqrt(r)]
+        """
         return self.field[0]
 
 
     @property
     def base_field(self):
+        """The base field of which the current field is an extension.
+        
+        The instance ist contained in the quardratic extension field
+        base_field[sqrt(r)]
+        """
         return self.field[1]
 
 
     def __repr__(self):
+        """eval-able representation of the instance"""
         return '%s(%r, %r, %r)' % (self.__class__.__name__, self.a, self.b, self.field)
 
 
     def __str__(self):
+        """readable representation of the instance"""
         if not self.b:
             return str(self.a)
         elif self.b==1:
@@ -216,6 +245,7 @@ class Constructible(object):
 
     # Multiplicative Group Operations * /
     def inverse(self):
+        """the multiplicative inverse of the instance"""
         if self.field:
             # 1/(a+b√r) = (a-b√r)/((a+b√r)*(a-b√r)) = (a+b√r) / (a*a-b*b*r)
             d = self.a * self.a - self.b * self.b * self.r
@@ -263,6 +293,13 @@ class Constructible(object):
 
     # equality and ordering
     def _sign(self):
+        """The sign of the instance
+        
+        x._sign() ==  1  if  x > 0
+        x._sign() ==  0  if  x == 0
+        x._sign() == -1  if  x < 0 
+        """
+        
         # pylint: disable=maybe-no-member
         if self.is_zero:
             return 0
@@ -355,8 +392,11 @@ class Constructible(object):
             return float(self.a)
 
     def join(self, other):
-        '''return a tuple (new_self, new_other) such that
-        new_self == self, new_other == other, and new_self.field == new_other.field '''
+        '''Express self and other as members of a common field.
+        
+        return a tuple (new_self, new_other) such that
+        new_self == self, new_other == other, and new_self.field == new_other.field
+        '''
         if self.field == other.field:
             return self, other
 
@@ -365,6 +405,14 @@ class Constructible(object):
 
     @staticmethod
     def join_fields(field1, field2):
+        """find an extension field containing both field1 and field2
+        
+        returns the resulting field containing both field1 and field2 and
+        two mappings for representing instances of the original fields in the new field.
+        f1: field1 --> field:  f1(x) == x
+        f2: field2 --> field:  f2(x) == x
+
+        """
         # pylint: disable=function-redefined
         Q = ()
 
@@ -407,6 +455,10 @@ class Constructible(object):
 
     @staticmethod
     def lift_rational_field(q, field):
+        """represent a rational q in the given field
+        
+        return a Constructible x such that x == q and x.field == field
+        """
         if not field:
             return Constructible(q)
         else:
@@ -455,7 +507,12 @@ class Constructible(object):
         return None
 
 def sqrt(n):
-    '''return the square root of n in an exact representation'''
+    '''return the square root of n in an exact representation
+    
+    If possible the square root is expressed in the field of the 
+    argument thus avoiding redundand field extensions such as
+    Q[√2][√3][√6]
+    '''
     if isinstance(n, Rational):
         n = Constructible(n)
     elif not isinstance(n, Constructible):
