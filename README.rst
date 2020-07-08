@@ -72,6 +72,7 @@ Changelog
 -  2016-09-30 V0.2 Fixing Issue 1 and added Tests
 -  2016-10-03 V0.3 Fixing Issue 2
 -  2016-10-23 V0.4 Added __hash__ and __float__, speed optimizations
+-  2020-07-08 V0.5 New hash function and improvements by `Arsenii A.`
 
 Aknowledgements
 ---------------
@@ -87,6 +88,7 @@ in quadratic extension fields.
 .. _Anders Kaseorg: https://github.com/andersk
 .. _implementation of constructible numbers in Haskell: https://github.com/andersk/haskell-constructible
 .. _algorithm for taking square roots: https://github.com/leovt/constructible/wiki/Taking-Square-Roots-in-quadratic-extension-Fields
+.. Arsenii A.: https://github.com/arseniiv
 
 .. |Build Status| image:: https://travis-ci.org/leovt/constructible.svg?branch=master
    :target: https://travis-ci.org/leovt/constructible
