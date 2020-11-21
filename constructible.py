@@ -176,7 +176,7 @@ class Constructible(object):
     def base_field(self):
         """The base field of which the current field is an extension.
         
-        The instance ist contained in the quardratic extension field
+        The instance ist contained in the quadratic extension field
         base_field[sqrt(r)]
         """
         return self.field[1]
@@ -247,7 +247,7 @@ class Constructible(object):
     def inverse(self):
         """the multiplicative inverse of the instance"""
         if self.field:
-            # 1/(a+b√r) = (a-b√r)/((a+b√r)*(a-b√r)) = (a+b√r) / (a*a-b*b*r)
+            # 1/(a+b√r) = (a-b√r)/((a+b√r)*(a-b√r)) = (a-b√r) / (a*a-b*b*r)
             d = self.a * self.a - self.b * self.b * self.r
             return Constructible(self.a / d, -self.b / d, self.field)
         else:
